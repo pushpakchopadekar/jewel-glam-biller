@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
-import { Gem, Home, Package, ShoppingCart, History, Archive, BarChart3, Bell, Settings, Sun, Moon, User, LogOut, AlertTriangle, Receipt } from 'lucide-react';
+import { Gem, Home, Package, ShoppingCart, History, Archive, BarChart3, Bell, Settings, Sun, Moon, User, LogOut, AlertTriangle, Receipt, TrendingUp, DollarSign, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ProductRegistration from './ProductRegistration';
 import StartSale from './StartSale';
 import RegisteredProducts from './RegisteredProducts';
@@ -43,15 +45,31 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
   ];
 
   const statsData = [
-    { title: "Today's Sales", value: "₹12,540", change: "+15%", color: "from-green-500 to-emerald-600", icon: ShoppingCart },
-    { title: "Monthly Revenue", value: "₹3,45,680", change: "+28%", color: "from-blue-500 to-cyan-600", icon: BarChart3 },
-    { title: "Pending Payments", value: "₹8,920", change: "-5%", color: "from-orange-500 to-red-600", icon: Bell },
-    { title: "Low Stock Items", value: "3", change: "Alert", color: "from-red-500 to-pink-600", icon: AlertTriangle },
+    { title: "Today's Sales", value: "₹12,540", change: "+15%", color: "from-emerald-500 to-teal-600", icon: TrendingUp },
+    { title: "Monthly Revenue", value: "₹3,45,680", change: "+28%", color: "from-violet-500 to-purple-600", icon: DollarSign },
+    { title: "Pending Payments", value: "₹8,920", change: "-5%", color: "from-rose-500 to-pink-600", icon: Bell },
+    { title: "Low Stock Items", value: "3", change: "Alert", color: "from-orange-500 to-red-600", icon: AlertTriangle },
+  ];
+
+  // Sample data for charts
+  const monthlyData = [
+    { name: 'Jan', gold: 45000, silver: 12000, imitation: 8000 },
+    { name: 'Feb', gold: 52000, silver: 15000, imitation: 9500 },
+    { name: 'Mar', gold: 48000, silver: 13500, imitation: 11000 },
+    { name: 'Apr', gold: 61000, silver: 18000, imitation: 12500 },
+    { name: 'May', gold: 55000, silver: 16500, imitation: 10800 },
+    { name: 'Jun', gold: 67000, silver: 20000, imitation: 14000 },
+  ];
+
+  const pieData = [
+    { name: 'Gold', value: 328000, color: '#F59E0B' },
+    { name: 'Silver', value: 95000, color: '#6B7280' },
+    { name: 'Imitation', value: 65800, color: '#EC4899' }
   ];
 
   const updateMetalRates = () => {
     toast({
-      title: "Rates Updated Successfully! ✨",
+      title: "✨ Rates Updated Successfully!",
       description: `Gold: ₹${metalRates.gold}/g, Silver: ₹${metalRates.silver}/g`,
     });
   };
@@ -86,12 +104,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
       case 'sales-overview':
         return <SalesOverview />;
       case 'invoices':
-        return <SalesHistory />; // Reusing SalesHistory for invoices
+        return <SalesHistory />;
       default:
         return (
           <main className="p-6 space-y-8">
             {/* Metal Rates Widget */}
-            <Card className="bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-2xl border-0">
+            <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-2xl border-0">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Gem className="w-6 h-6 animate-spin-slow" />
@@ -101,33 +119,33 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <Label className="text-amber-100">Gold Rate (₹/gram)</Label>
+                    <Label className="text-indigo-100">Gold Rate (₹/gram)</Label>
                     <Input
                       type="number"
                       value={metalRates.gold}
                       onChange={(e) => setMetalRates({...metalRates, gold: e.target.value})}
-                      className="mt-1 bg-white/20 border-white/30 text-white placeholder-amber-100"
+                      className="mt-1 bg-white/20 border-white/30 text-white placeholder-indigo-100"
                     />
                   </div>
                   <div>
-                    <Label className="text-amber-100">Silver Rate (₹/gram)</Label>
+                    <Label className="text-indigo-100">Silver Rate (₹/gram)</Label>
                     <Input
                       type="number"
                       value={metalRates.silver}
                       onChange={(e) => setMetalRates({...metalRates, silver: e.target.value})}
-                      className="mt-1 bg-white/20 border-white/30 text-white placeholder-amber-100"
+                      className="mt-1 bg-white/20 border-white/30 text-white placeholder-indigo-100"
                     />
                   </div>
                   <div className="flex items-end">
                     <Button 
                       onClick={updateMetalRates}
-                      className="w-full bg-white text-amber-600 hover:bg-amber-50 shadow-lg transform hover:scale-105 transition-all duration-300"
+                      className="w-full bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg transform hover:scale-105 transition-all duration-300"
                     >
                       Update Rates
                     </Button>
                   </div>
                 </div>
-                <p className="text-amber-100 text-sm mt-3">
+                <p className="text-indigo-100 text-sm mt-3">
                   Last Updated: Today, {new Date().toLocaleTimeString()}
                 </p>
               </CardContent>
@@ -136,14 +154,14 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
             {/* Stats Cards */}
             <div className="grid md:grid-cols-4 gap-6">
               {statsData.map((stat, index) => (
-                <Card key={index} className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg">
+                <Card key={index} className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 shadow-lg border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg">
                   <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-10 group-hover:opacity-20 transition-opacity`}></div>
                   <CardContent className="p-6 relative">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">{stat.title}</p>
                         <p className="text-2xl font-bold text-gray-800 dark:text-white mt-1">{stat.value}</p>
-                        <p className={`text-sm mt-1 ${stat.change.includes('+') ? 'text-green-600' : stat.change === 'Alert' ? 'text-red-600 animate-pulse' : 'text-red-600'}`}>
+                        <p className={`text-sm mt-1 ${stat.change.includes('+') ? 'text-emerald-600' : stat.change === 'Alert' ? 'text-red-600 animate-pulse' : 'text-red-600'}`}>
                           {stat.change}
                         </p>
                       </div>
@@ -156,37 +174,92 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
               ))}
             </div>
 
-            {/* Sales Performance Chart Placeholder */}
-            <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg">
+            {/* Sales Performance Charts */}
+            <Card className="shadow-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="w-6 h-6 text-purple-600" />
+                  <BarChart3 className="w-6 h-6 text-indigo-600 animate-pulse" />
                   <span>Sales Performance</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg flex items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-600">
-                  <div className="text-center">
-                    <BarChart3 className="w-16 h-16 text-purple-500 mx-auto mb-4 animate-bounce" />
-                    <p className="text-gray-600 dark:text-gray-300 font-semibold">Interactive Charts</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Click on "Sales Overview" to view detailed analytics</p>
-                  </div>
-                </div>
+                <Tabs defaultValue="bar" className="space-y-6">
+                  <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
+                    <TabsTrigger value="bar" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+                      📊 Bar Chart
+                    </TabsTrigger>
+                    <TabsTrigger value="line" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white">
+                      📈 Line Chart
+                    </TabsTrigger>
+                    <TabsTrigger value="pie" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-pink-600 data-[state=active]:text-white">
+                      🥧 Pie Chart
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="bar">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={monthlyData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="gold" fill="#F59E0B" />
+                        <Bar dataKey="silver" fill="#6B7280" />
+                        <Bar dataKey="imitation" fill="#EC4899" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </TabsContent>
+
+                  <TabsContent value="line">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={monthlyData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="gold" stroke="#F59E0B" strokeWidth={3} />
+                        <Line type="monotone" dataKey="silver" stroke="#6B7280" strokeWidth={3} />
+                        <Line type="monotone" dataKey="imitation" stroke="#EC4899" strokeWidth={3} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </TabsContent>
+
+                  <TabsContent value="pie">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 
             {/* Inventory Overview */}
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
+              <Card className="shadow-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
                     <Package className="w-6 h-6 text-white" />
                   </div>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white">1,245</p>
                   <p className="text-gray-600 dark:text-gray-300">Total Items</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
+              <Card className="shadow-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
                     <Bell className="w-6 h-6 text-white" />
@@ -195,10 +268,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
                   <p className="text-gray-600 dark:text-gray-300">Low Stock</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
+              <Card className="shadow-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <User className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Users className="w-6 h-6 text-white" />
                   </div>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white">156</p>
                   <p className="text-gray-600 dark:text-gray-300">Total Customers</p>
@@ -213,12 +286,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
   return (
     <div className={`min-h-screen ${isDarkTheme ? 'dark' : ''}`}>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900">
+        <div className="min-h-screen flex w-full bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-900/20 dark:to-purple-900/20">
           {/* Sidebar */}
           <Sidebar>
             <SidebarHeader className="p-6">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center transform rotate-12 hover:rotate-45 transition-transform duration-500 shadow-2xl">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center transform rotate-12 hover:rotate-45 transition-transform duration-500 shadow-2xl">
                   <Gem className="w-8 h-8 text-white animate-spin-slow" />
                 </div>
                 <div>
@@ -235,10 +308,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
                     <SidebarMenuButton
                       onClick={() => setActiveTab(item.id)}
                       isActive={activeTab === item.id}
-                      className="w-full justify-start space-x-3 py-3 px-4 rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 hover:shadow-lg transform hover:scale-105"
+                      className="w-full justify-start space-x-3 py-3 px-4 rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 hover:shadow-lg transform hover:scale-105"
                     >
-                      <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-purple-600 animate-pulse' : 'text-gray-600 dark:text-gray-300'}`} />
-                      <span className={`${activeTab === item.id ? 'text-purple-600 font-semibold' : 'text-gray-700 dark:text-gray-300'}`}>
+                      <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-indigo-600 animate-pulse' : 'text-gray-600 dark:text-gray-300'}`} />
+                      <span className={`${activeTab === item.id ? 'text-indigo-600 font-semibold' : 'text-gray-700 dark:text-gray-300'}`}>
                         {item.title}
                       </span>
                     </SidebarMenuButton>
@@ -251,11 +324,11 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
           {/* Main Content */}
           <SidebarInset className="flex-1">
             {/* Top Navbar */}
-            <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-xl border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg shadow-xl border-b border-gray-200 dark:border-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <SidebarTrigger className="hover:bg-purple-100 dark:hover:bg-purple-900/20 p-2 rounded-lg transition-colors" />
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <SidebarTrigger className="hover:bg-indigo-100 dark:hover:bg-indigo-900/20 p-2 rounded-lg transition-colors" />
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                     {menuItems.find(item => item.id === activeTab)?.title || 
                      navbarItems.find(item => item.id === activeTab)?.title || 'Dashboard'}
                   </h1>
@@ -268,7 +341,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
                       onClick={() => handleNavbarItemClick(item.id)}
                       variant="outline"
                       size="sm"
-                      className="hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 border-purple-200 dark:border-purple-600 transition-all duration-300 transform hover:scale-105"
+                      className="hover:bg-gradient-to-r hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 border-indigo-200 dark:border-indigo-600 transition-all duration-300 transform hover:scale-105"
                     >
                       <item.icon className="w-4 h-4 mr-2" />
                       {item.title}
@@ -283,7 +356,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({ onLogout }) => {
                     {isDarkTheme ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                   </Button>
                   <div className="relative group">
-                    <Button variant="outline" size="sm" className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/20">
+                    <Button variant="outline" size="sm" className="p-2 hover:bg-indigo-100 dark:hover:bg-indigo-900/20">
                       <User className="w-4 h-4" />
                     </Button>
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">

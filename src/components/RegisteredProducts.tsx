@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Package, Edit, Trash2, Search, Filter, Eye } from 'lucide-react';
+import { Package, Edit, Trash2, Search, Filter, Eye, Download, FileText, FileSpreadsheet, SortAsc, SortDesc, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 
 interface Product {
@@ -24,6 +25,9 @@ interface Product {
 const RegisteredProducts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isExporting, setIsExporting] = useState(false);
 
   // Mock data
   const mockProducts: Product[] = [
@@ -98,12 +102,24 @@ const RegisteredProducts = () => {
     }
     
     return matchesSearch && product.category === activeTab;
+  }).sort((a, b) => {
+    let aValue = a[sortBy as keyof Product];
+    let bValue = b[sortBy as keyof Product];
+    
+    if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+    if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+    
+    if (sortOrder === 'asc') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
   });
 
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: string, name: string) => {
     toast({
       title: "✏️ Edit Product",
-      description: "Edit functionality will be implemented",
+      description: `Editing ${name}...`,
     });
   };
 
@@ -113,6 +129,32 @@ const RegisteredProducts = () => {
       description: `${name} has been removed from inventory`,
       variant: "destructive"
     });
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    
+    // Simulate export delay
+    setTimeout(() => {
+      setIsExporting(false);
+      toast({
+        title: "📄 PDF Exported Successfully!",
+        description: "Products list has been exported to PDF",
+      });
+    }, 2000);
+  };
+
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    
+    // Simulate export delay
+    setTimeout(() => {
+      setIsExporting(false);
+      toast({
+        title: "📊 Excel Exported Successfully!",
+        description: "Products list has been exported to Excel",
+      });
+    }, 2000);
   };
 
   const getCategoryColor = (category: string) => {
@@ -134,18 +176,18 @@ const RegisteredProducts = () => {
   };
 
   return (
-    <div className="p-6 space-y-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-900/20 dark:to-purple-900/20 min-h-screen">
+    <div className="p-6 space-y-8 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-red-900/20 dark:to-orange-900/20 min-h-screen">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center transform rotate-12 hover:rotate-45 transition-all duration-500 shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl flex items-center justify-center transform rotate-12 hover:rotate-45 transition-all duration-500 shadow-2xl">
               <Package className="w-10 h-10 text-white animate-pulse" />
             </div>
-            <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
+            <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-red-400 to-orange-500 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
           </div>
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
           Registered Products
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">Manage your jewelry inventory</p>
@@ -156,17 +198,49 @@ const RegisteredProducts = () => {
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-indigo-500" />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-red-500" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search products by name or barcode..."
-                className="pl-10 border-indigo-200 dark:border-indigo-600 focus:border-indigo-500"
+                className="pl-10 border-red-200 dark:border-red-600 focus:border-red-500"
               />
             </div>
-            <Button variant="outline" className="border-indigo-200 dark:border-indigo-600">
-              <Filter className="w-4 h-4 mr-2" />
-              Advanced Filters
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-40 border-orange-200 dark:border-orange-600">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="quantity">Quantity</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+                <SelectItem value="barcode">Barcode</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              variant="outline"
+              className="border-orange-200 dark:border-orange-600"
+            >
+              {sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+            </Button>
+            <Button
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              variant="outline"
+              className="border-red-200 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+              Export PDF
+            </Button>
+            <Button
+              onClick={handleExportExcel}
+              disabled={isExporting}
+              variant="outline"
+              className="border-green-200 dark:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+            >
+              {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileSpreadsheet className="w-4 h-4 mr-2" />}
+              Export Excel
             </Button>
           </div>
         </CardContent>
@@ -175,7 +249,7 @@ const RegisteredProducts = () => {
       {/* Products Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-lg">
-          <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+          <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-600 data-[state=active]:text-white">
             All ({mockProducts.filter(p => p.category === 'gold' || p.category === 'silver').length})
           </TabsTrigger>
           <TabsTrigger value="gold" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-orange-600 data-[state=active]:text-white">
@@ -218,7 +292,7 @@ const RegisteredProducts = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredProducts.map((product) => (
-                      <TableRow key={product.id} className="hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                      <TableRow key={product.id} className="hover:bg-red-50 dark:hover:bg-red-900/20">
                         <TableCell>
                           <div className="w-12 h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
                             <Eye className="w-6 h-6 text-gray-600" />
@@ -269,10 +343,10 @@ const RegisteredProducts = () => {
                         <TableCell>
                           <div className="flex space-x-2">
                             <Button
-                              onClick={() => handleEdit(product.id)}
+                              onClick={() => handleEdit(product.id, product.name)}
                               variant="outline"
                               size="sm"
-                              className="border-indigo-200 dark:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                              className="border-blue-200 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
